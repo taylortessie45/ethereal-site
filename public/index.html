@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ethereal · Apply to join</title>
+<meta name="description" content="Apply to join Ethereal.">
+<meta name="theme-color" content="#0b0a1a">
+<link rel="icon" type="image/jpeg" href="/logo.jpg">
+<link rel="apple-touch-icon" href="/logo.jpg">
+<meta property="og:image" content="/logo.jpg">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="sky" aria-hidden="true">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="stars"></div>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="/"><img src="/logo.jpg" alt="" width="34" height="34"><span>Ethereal</span></a>
+  <nav>
+    <a class="icon-link" href="https://x.com/Etherealweb3_" target="_blank" rel="noopener noreferrer" aria-label="Ethereal on X (@Etherealweb3_)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg></a>
+    <a class="btn-sm" aria-label="Join Ethereal on Discord" href="https://discord.gg/nZYb5DTMH" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.7-3.6-13.8ZM8.5 15.4c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm7 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></svg><span>Join Ethereal</span></a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <img class="logo" src="/logo.jpg" alt="Ethereal logo" width="112" height="112">
+    <p class="eyebrow">✦ Applications open</p>
+    <h1>Ethereal</h1>
+    <p class="lede">Connecting innovators and dreamers. Together, we build. Tell us who you are.</p>
+    <div class="ctas">
+      <a class="cta" href="#apply">Apply to join</a>
+      <a class="cta ghost" href="https://discord.gg/nZYb5DTMH" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.7-3.6-13.8ZM8.5 15.4c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm7 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></svg>Join Ethereal</a>
+    </div>
+    <p class="founder">Founded by <a href="https://x.com/tenacious_ar" target="_blank" rel="noopener noreferrer">@tenacious_ar</a> · <a href="https://x.com/Etherealweb3_" target="_blank" rel="noopener noreferrer">@Etherealweb3_</a></p>
+  </section>
+
+  <section id="apply" class="panel">
+    <form id="form" novalidate>
+      <h2>Your application</h2>
+      <p class="hint">Five questions. Takes about two minutes.</p>
+
+      <div class="row two">
+        <div class="field">
+          <label for="discord">What's your Discord username?</label>
+          <input id="discord" name="discord" autocomplete="off" placeholder="e.g. lunar.drift" maxlength="37" required>
+          <small class="err" data-for="discord"></small>
+        </div>
+        <div class="field">
+          <label for="x">What's your X (Twitter) username?</label>
+          <div class="prefix"><span>@</span><input id="x" name="x" autocomplete="off" placeholder="yourhandle" maxlength="16" required></div>
+          <small class="err" data-for="x"></small>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="why">Why do you want to join Ethereal?</label>
+        <p class="help" id="why-help">Tell us what interests you about our community and why you'd like to be part of it.</p>
+        <textarea id="why" aria-describedby="why-help" name="why" rows="4" maxlength="1500" required></textarea>
+        <div class="meta"><small class="err" data-for="why"></small><small class="count" data-for="why">0 / 1500</small></div>
+      </div>
+
+      <div class="field">
+        <label for="value">What value can you bring to Ethereal?</label>
+        <p class="help" id="value-help">How do you see yourself contributing to the community?</p>
+        <textarea id="value" aria-describedby="value-help" name="value" rows="4" maxlength="1500" required></textarea>
+        <div class="meta"><small class="err" data-for="value"></small><small class="count" data-for="value">0 / 1500</small></div>
+      </div>
+
+      <div class="field">
+        <label for="about">Tell us a little about yourself.</label>
+        <p class="help" id="about-help">Share a brief introduction, including your interests, experience, or what you're currently working on.</p>
+        <textarea id="about" aria-describedby="about-help" name="about" rows="4" maxlength="1500" required></textarea>
+        <div class="meta"><small class="err" data-for="about"></small><small class="count" data-for="about">0 / 1500</small></div>
+      </div>
+
+      <!-- honeypot: hidden from humans -->
+      <div class="hp" aria-hidden="true">
+        <label for="website">Website</label>
+        <input id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <p class="form-error" id="formError" role="alert"></p>
+      <button type="submit" id="submit"><span>Submit application</span></button>
+    </form>
+
+    <div id="success" class="success" hidden>
+      <img class="check" src="/logo.jpg" alt="" width="72" height="72">
+      <h2>Thank you for applying to join Ethereal!</h2>
+      <p>Ethereal is a public server, so everyone is welcome to join.</p>
+      <p>Make sure you join our Discord server:<br><a href="https://discord.gg/nZYb5DTMH" target="_blank" rel="noopener noreferrer">https://discord.gg/nZYb5DTMH</a></p>
+      <a class="cta discord" href="https://discord.gg/nZYb5DTMH" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.7-3.6-13.8ZM8.5 15.4c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm7 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></svg>Join our Discord</a>
+      <p>Once applications are reviewed, selected applicants will receive their roles manually.</p>
+      <p>Thank you for taking the time to apply and for showing interest in becoming part of Ethereal.</p>
+      <p class="luck">Good luck!</p>
+    </div>
+  </section>
+
+  <footer>
+    <a class="cta ghost small" href="https://discord.gg/nZYb5DTMH" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18 18 0 0 0-5.6 0L8.6 3a19.5 19.5 0 0 0-4.9 1.5C.6 9.1-.3 13.7.1 18.2a19.8 19.8 0 0 0 6 3l1.3-2.1a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 12.2 0l.5.4c-.6.4-1.3.7-2 1l1.3 2.1a19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.7-3.6-13.8ZM8.5 15.4c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm7 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></svg>Join Ethereal</a>
+    <p><a href="https://x.com/Etherealweb3_" target="_blank" rel="noopener noreferrer">@Etherealweb3_</a> · Founded by <a href="https://x.com/tenacious_ar" target="_blank" rel="noopener noreferrer">@tenacious_ar</a></p>
+    <p>© <span id="yr"></span> Ethereal</p>
+  </footer>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>
