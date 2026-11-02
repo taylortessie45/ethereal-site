@@ -1,3 +1,4 @@
+[hidden]{display:none!important}
 :root{
   --bg:#0b0a1a;--text:#ecebf7;--muted:#a19dbf;--line:rgba(255,255,255,.1);
   --accent:#a78bfa;--accent2:#67e8f9;--err:#fda4af;
@@ -116,3 +117,15 @@ footer p{margin:4px 0}
   .btn-sm span{display:none}.btn-sm{padding:9px}
   .logo{width:92px;height:92px}
 }
+
+/* countdown */
+.countdown{margin:30px auto 0;max-width:420px}
+.cd-label{margin:0 0 10px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#d8ccff}
+.cd-units{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cd-units div{padding:12px 4px 10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);backdrop-filter:blur(6px)}
+.cd-units span{display:block;font-size:30px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;
+  background:linear-gradient(120deg,#fff,#c4b5fd 50%,#a5f3fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cd-units small{display:block;margin-top:4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cd-when{margin:10px 0 0;font-size:13px;color:var(--muted)}
+.closed h2{margin-bottom:8px}
+@media (max-width:600px){.cd-units span{font-size:24px}}

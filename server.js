@@ -18,6 +18,12 @@ try {
 const PORT = Number(process.env.PORT) || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
+const CLOSE_RAW = (process.env.APPLICATIONS_CLOSE_AT || '').trim();
+const CLOSE_AT = CLOSE_RAW ? new Date(CLOSE_RAW) : null;
+if (CLOSE_RAW && isNaN(CLOSE_AT)) console.warn(`APPLICATIONS_CLOSE_AT is not a valid ISO 8601 date ("${CLOSE_RAW}"); ignoring it.`);
+const closesAtISO = () => (CLOSE_AT && !isNaN(CLOSE_AT) ? CLOSE_AT.toISOString() : null);
+const isOpen = () => { const c = closesAtISO(); return !c || Date.now() < CLOSE_AT.getTime(); };
+const CLOSED_MSG = 'Applications are closed. Thank you for your interest in Ethereal!';
 const DATA_FILE = path.resolve(process.env.DATA_FILE || path.join(__dirname, 'applications.json'));
 
 const app = express();
@@ -111,7 +117,12 @@ async function postToDiscord(a) {
 }
 
 // ---------- API ----------
+app.get('/api/status', (req, res) => {
+  res.set('Cache-Control', 'no-store').json({ open: isOpen(), closesAt: closesAtISO(), now: new Date().toISOString() });
+});
+
 app.post('/api/apply', async (req, res) => {
+  if (!isOpen()) return res.status(403).json({ ok: false, closed: true, error: CLOSED_MSG });
   const body = req.body || {};
   // Honeypot: real users never fill "website". Pretend success for bots.
   if (typeof body.website === 'string' && body.website.trim() !== '') {
@@ -142,9 +153,26 @@ function requireAdmin(req, res, next) {
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+const csvCell = (v) => {
+  let t = v == null ? '' : String(v);
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; // guard against spreadsheet formula injection
+  return '"' + t.replace(/"/g, '""') + '"';
+};
+app.get('/admin/applications.csv', requireAdmin, (req, res) => {
+  const header = ['id', 'submitted time', 'Discord username', 'X username', 'why join', 'value', 'about'];
+  const rows = readApps().map((a) => [a.id, a.submittedAt, a.discord, a.x, a.why, a.value, a.about]);
+  const csv = '\uFEFF' + [header, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
+  const stamp = new Date().toISOString().slice(0, 10);
+  res.set({
+    'Content-Type': 'text/csv; charset=utf-8',
+    'Content-Disposition': `attachment; filename="ethereal-applications-${stamp}.csv"`,
+    'Cache-Control': 'no-store',
+  }).send(csv);
+});
 app.get('/admin/applications.json', requireAdmin, (req, res) => res.json(readApps()));
 app.get('/admin', requireAdmin, (req, res) => {
   const apps = readApps().slice().reverse();
+  const open = isOpen(), closes = closesAtISO();
   const rows = apps.map((a) => `
     <article class="card">
       <header><span class="lbl">Discord</span> <strong>${esc(a.discord)}</strong> · <span class="lbl">X</span> · <a href="https://x.com/${esc(a.x)}" target="_blank" rel="noopener">@${esc(a.x)}</a>
@@ -164,11 +192,23 @@ h1{font-weight:600;margin:0 0 4px}.sub{color:#9a96b8;margin:0 0 24px}a{color:#c4
 .card header{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.card time{margin-left:auto;color:#8b87a8;font-size:12px}
 h4{margin:14px 0 4px;font-size:13px;font-weight:600;color:#a78bfa}.lbl{color:#8b87a8;font-size:12px}
 p{margin:0;white-space:pre-wrap;line-height:1.5;color:#d4d1e8}
+.status{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:8px 0 14px;color:#d4d1e8}
+.pill{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.pill.open{background:rgba(52,211,153,.15);color:#6ee7b7}.pill.closed{background:rgba(251,113,133,.15);color:#fda4af}
+.sub{display:flex;gap:14px;align-items:center}
+.btn{display:inline-block;padding:8px 14px;border-radius:10px;background:linear-gradient(120deg,#7c3aed,#0891b2);color:#fff!important;text-decoration:none;font-weight:600}
 </style></head><body>
-<h1>Applications</h1><p class="sub">${apps.length} total · <a href="/admin/applications.json">JSON</a></p>
+<h1>Applications</h1>
+<div class="status">
+  <span class="pill ${open ? 'open' : 'closed'}">${open ? 'Open' : 'Closed'}</span>
+  <span>${closes ? `${open ? 'Closes' : 'Closed'} <time id="closes" datetime="${esc(closes)}">${esc(new Date(closes).toUTCString())}</time>` : 'No deadline set (APPLICATIONS_CLOSE_AT not set)'}</span>
+  <span class="total"><strong>${apps.length}</strong> total application${apps.length === 1 ? '' : 's'}</span>
+</div>
+<p class="sub"><a class="btn" href="/admin/applications.csv">Download CSV</a> <a href="/admin/applications.json">JSON</a></p>
+<script>const t=document.getElementById('closes');if(t)t.textContent=new Date(t.dateTime).toLocaleString(undefined,{dateStyle:'full',timeStyle:'short'})+' (your local time)';</script>
 <div class="grid">${rows || '<p>No applications yet.</p>'}</div></body></html>`);
 });
 
 app.use((req, res) => res.status(404).send('Not found'));
 
-app.listen(PORT, () => console.log(`Ethereal running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Ethereal running on http://localhost:${PORT}` + (closesAtISO() ? ` · applications close at ${closesAtISO()}` : '')));

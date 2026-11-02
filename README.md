@@ -27,7 +27,8 @@ The logo / favicon is `public/logo.jpg` (the @Etherealweb3_ X profile picture, 4
 - Spam protection: hidden honeypot field + rate limit (3 submissions / 15 min per IP)
 - Every application appended to `applications.json` with an ISO timestamp and id
 - Optional: each application posted as an embed to a Discord channel via webhook
-- Password-protected `/admin` page (HTTP basic auth) listing applications; raw JSON at `/admin/applications.json`
+- Optional application deadline (`APPLICATIONS_CLOSE_AT`): live countdown on the page, form replaced by a "closed" message afterwards, enforced server-side (403)
+- Password-protected `/admin` page (HTTP basic auth) listing applications, open/closed status, closing time and total count; **Download CSV** at `/admin/applications.csv`, raw JSON at `/admin/applications.json`
 
 ## Run locally
 Requires Node 18+.
@@ -46,7 +47,23 @@ Admin: open `http://localhost:3000/admin`, any username, password = `ADMIN_PASSW
 | `PORT` | no (default 3000) | Port to listen on |
 | `ADMIN_PASSWORD` | for `/admin` | Basic-auth password. `/admin` is disabled if unset |
 | `DISCORD_WEBHOOK_URL` | no | Discord channel webhook (Channel settings → Integrations → Webhooks → Copy URL) |
+| `APPLICATIONS_CLOSE_AT` | no | ISO 8601 deadline, e.g. `2026-11-05T00:00:00+06:00` or `2026-11-04T18:00:00Z`. Always include a timezone. Unset = always open |
 | `DATA_FILE` | no | Path of the JSON store (default `./applications.json`) |
+
+## Application deadline
+Set `APPLICATIONS_CLOSE_AT` to close applications at a fixed moment (server time is the source of truth):
+- `GET /api/status` → `{ "open": true, "closesAt": "2026-11-05T00:00:00.000Z", "now": "..." }`
+- While open, the page shows "Applications close in D/H/M/S" and the deadline in the visitor's local time.
+- After the deadline, `POST /api/apply` returns `403` (`{"ok":false,"closed":true,...}`) and the page shows
+  "Applications are now closed. Thank you for your interest in Ethereal!" with the Discord button.
+- To set a 48-hour window, take the start time and add 48 hours, e.g. opening at
+  2026-11-03 00:00 Dhaka time → `APPLICATIONS_CLOSE_AT=2026-11-05T00:00:00+06:00`.
+  Quick helper: `node -e "console.log(new Date(Date.now()+48*3600e3).toISOString())"`.
+- On Render: Service → Environment → add the variable → Save (the service redeploys).
+
+## Viewing applications
+Open `https://<your-site>/admin`, sign in with any username and `ADMIN_PASSWORD`.
+Use **Download CSV** to open all answers in Excel / Google Sheets.
 
 ## Deploy
 

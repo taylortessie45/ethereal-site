@@ -36,6 +36,46 @@
     });
   }
 
+  // ---------- deadline / countdown ----------
+  const $ = (id) => document.getElementById(id);
+  const closed = $('closed'), cd = $('countdown'), eyebrow = document.querySelector('.eyebrow');
+  let closesAt = null, skew = 0, timer = null;
+  const fmtLocal = (d) => d.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+  const pad = (n) => String(n).padStart(2, '0');
+
+  function showClosed() {
+    clearInterval(timer);
+    form.hidden = true; success.hidden = true; closed.hidden = false; cd.hidden = true;
+    if (eyebrow) eyebrow.textContent = '✦ Applications closed';
+    if (closesAt) $('closed-when').textContent = `Closed ${fmtLocal(closesAt)}`;
+    const cta = document.querySelector('.ctas .cta[href="#apply"]'); if (cta) cta.hidden = true;
+  }
+  function tick() {
+    const ms = closesAt.getTime() - (Date.now() + skew);
+    if (ms <= 0) {
+      clearInterval(timer);
+      if (!success.hidden) { cd.hidden = true; return; }
+      // Don't yank the form away from someone mid-typing; the server will reject on submit.
+      const typing = ['discord', 'x', 'why', 'value', 'about'].some((k) => form.elements[k].value.trim());
+      if (typing) { cd.querySelector('.cd-label').textContent = 'Applications have closed'; cd.querySelector('.cd-units').hidden = true; }
+      else showClosed();
+      return;
+    }
+    const t = Math.floor(ms / 1000);
+    $('cd-d').textContent = Math.floor(t / 86400);
+    $('cd-h').textContent = pad(Math.floor(t / 3600) % 24);
+    $('cd-m').textContent = pad(Math.floor(t / 60) % 60);
+    $('cd-s').textContent = pad(t % 60);
+  }
+  fetch('/api/status', { cache: 'no-store' }).then((r) => r.json()).then((st) => {
+    if (st.now) skew = new Date(st.now).getTime() - Date.now(); // align with server clock
+    if (st.closesAt) closesAt = new Date(st.closesAt);
+    if (!st.open) return showClosed();
+    if (!closesAt) return;
+    $('cd-when').textContent = `Deadline: ${fmtLocal(closesAt)}`;
+    cd.hidden = false; tick(); timer = setInterval(tick, 1000);
+  }).catch(() => {});
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     formError.textContent = '';
@@ -55,6 +95,7 @@
         success.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
+      if (res.status === 403 && data.closed) { showClosed(); return; }
       if (data.errors) for (const [k, m] of Object.entries(data.errors)) setErr(k, m);
       formError.textContent = data.error || (data.errors ? 'Please fix the highlighted fields.' : 'Something went wrong. Please try again.');
     } catch {
