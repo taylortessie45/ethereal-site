@@ -24,7 +24,7 @@ The logo / favicon is `public/logo.jpg` (the @Etherealweb3_ X profile picture, 4
 - Dark, dreamy, mobile-friendly landing page + application form
 - Client **and** server validation (text answers 20–1500 chars; valid Discord/X handles)
 - Thank-you screen after submitting, with a "Join our Discord" button
-- Spam protection: hidden honeypot field + rate limit (3 submissions / 15 min per IP)
+- Spam protection: hidden honeypot field + rate limit (10 submissions / 15 min per real client IP, read from `CF-Connecting-IP` / `True-Client-IP` / first `X-Forwarded-For` entry behind proxies; tune with `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MIN`)
 - Every application appended to `applications.json` with an ISO timestamp and id
 - Optional: each application posted as an embed to a Discord channel via webhook
 - Optional application deadline (`APPLICATIONS_CLOSE_AT`): live countdown on the page, form replaced by a "closed" message afterwards, enforced server-side (403)

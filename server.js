@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const net = require('net');
 
 // Minimal .env loader (no dependency)
 try {
@@ -27,7 +28,7 @@ const CLOSED_MSG = 'Applications are closed. Thank you for your interest in Ethe
 const DATA_FILE = path.resolve(process.env.DATA_FILE || path.join(__dirname, 'applications.json'));
 
 const app = express();
-app.set('trust proxy', 1);
+app.set('trust proxy', true); // behind Render's proxy chain; rate limiting uses clientIp() below
 app.disable('x-powered-by');
 app.use(express.json({ limit: '20kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -58,7 +59,29 @@ function validate(body) {
 }
 
 // ---------- rate limit (in-memory, per IP) ----------
-const WINDOW_MS = 15 * 60 * 1000, MAX_PER_WINDOW = 3;
+// Configurable via env; defaults suit a community (shared mobile/university networks).
+const WINDOW_MS = (Number(process.env.RATE_LIMIT_WINDOW_MIN) || 15) * 60 * 1000;
+const MAX_PER_WINDOW = Number(process.env.RATE_LIMIT_MAX) || 10;
+
+// Real client IP behind Render/Railway/Cloudflare proxies. req.ip alone can be the proxy's
+// address (all visitors would share one bucket), so prefer the proxy-set client headers,
+// then the first valid X-Forwarded-For entry, then the socket address.
+function clientIp(req) {
+  const clean = (v) => {
+    if (!v) return '';
+    let ip = String(v).trim().replace(/^\[|\]$/g, '');
+    if (/^\d+\.\d+\.\d+\.\d+:\d+$/.test(ip)) ip = ip.replace(/:\d+$/, ''); // strip IPv4 port
+    if (ip.startsWith('::ffff:')) ip = ip.slice(7);
+    return net.isIP(ip) ? ip : '';
+  };
+  for (const h of ['cf-connecting-ip', 'true-client-ip']) {
+    const ip = clean(req.headers[h]);
+    if (ip) return ip;
+  }
+  const xff = String(req.headers['x-forwarded-for'] || '').split(',');
+  for (const part of xff) { const ip = clean(part); if (ip) return ip; }
+  return clean(req.ip) || clean(req.socket.remoteAddress) || 'unknown';
+}
 const hits = new Map();
 function rateLimited(ip) {
   const now = Date.now();
@@ -130,7 +153,7 @@ app.post('/api/apply', async (req, res) => {
   }
   const { errors, data } = validate(body);
   if (Object.keys(errors).length) return res.status(400).json({ ok: false, errors });
-  if (rateLimited(req.ip)) {
+  if (rateLimited(clientIp(req))) {
     return res.status(429).json({ ok: false, error: 'Too many applications from your network. Please try again later.' });
   }
   const entry = { id: crypto.randomUUID(), submittedAt: new Date().toISOString(), ...data };
